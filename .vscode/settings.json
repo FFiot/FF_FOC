@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "assert.h": "c",
+        "simple_foc.h": "c"
+    }
+}
