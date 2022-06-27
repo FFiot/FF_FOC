@@ -27,6 +27,26 @@ typedef struct{
 	float w;
 }phase_data_t;
 
+typedef enum{
+	SVPWM_V0 = 0,
+	SVPWM_V1 = 1,
+	SVPWM_V2 = 2,
+	SVPWM_V3 = 3,
+	SVPWM_V4 = 4,
+	SVPWM_V5 = 5,
+	SVPWM_V6 = 6,
+	SVPWM_V7 = 7,
+}SVPWM_VECTOR_T;
+
+typedef struct{
+	SVPWM_VECTOR_T 	vector;
+	float 			duty;
+}svpwm_t;
+
+typedef struct{
+	svpwm_t svpwm[3];
+}svpwm_sequence_t;
+
 typedef struct{
 	float alpha;
 	float beta;
@@ -41,6 +61,7 @@ void phase_to_clarke(const phase_data_t *input, clarke_t *clarke);
 void clarke_to_phase(const clarke_t *clarke, phase_data_t *output);
 void clarke_to_park(const clarke_t *clack, park_t *park, float sine, float cosine);
 void park_to_clarke(const park_t *pack, clarke_t *clack, float sine, float cosine);
+void park_to_svpwm(const park_t *park, float electic_angle, svpwm_sequence_t *sequence);
 
 typedef struct{
 	float P;

@@ -51,6 +51,60 @@ inline void clarke_to_phase(const clarke_t *clarke, phase_data_t *output)
 	output->w = -0.5f * clarke->alpha - _SQRT3_2 * clarke->beta;
 }
 
+inline void park_to_svpwm(const park_t *park, float electic_angle, svpwm_sequence_t *sequence)
+{
+	float result = park->q;
+	if(result > 1.0f){
+		result = 1.0f;
+	}
+	
+	electic_angle = electic_angle / _PI * 180.0f;
+	electic_angle = electic_angle + 90.0f;
+	
+	while(electic_angle >= 360.0f){
+		electic_angle -= 360.0f;
+	}
+	while(electic_angle < 0.0f){
+		electic_angle += 360.0f;
+	}
+	
+	SVPWM_VECTOR_T vector1, vector2;
+	if(electic_angle < 60.0f){			// sector1
+		vector1 = SVPWM_V1;
+		vector2 = SVPWM_V3;
+		electic_angle = electic_angle - 0.0f;
+	}else if(electic_angle < 120.0f){	// sector2
+		vector1 = SVPWM_V3;
+		vector2 = SVPWM_V2;
+		electic_angle = electic_angle - 60.0f;
+	}else if(electic_angle < 180.0f){	// sector3
+		vector1 = SVPWM_V2;
+		vector2 = SVPWM_V6;
+		electic_angle = electic_angle - 120.0f;
+	}else if(electic_angle < 240.0f){	// sector4
+		vector1 = SVPWM_V6;
+		vector2 = SVPWM_V4;
+		electic_angle = electic_angle - 180.0f;
+	}else if(electic_angle < 300.0f){	// sector5
+		vector1 = SVPWM_V4;
+		vector2 = SVPWM_V5;
+		electic_angle = electic_angle - 240.0f;
+	}else if(electic_angle < 360.0f){	// sector6
+		vector1 = SVPWM_V5;
+		vector2 = SVPWM_V1;
+		electic_angle = electic_angle - 300.0f;
+	}
+	
+	electic_angle = electic_angle / 180.0f * _PI;
+	
+	sequence->svpwm[0].vector 	= SVPWM_V0;
+	sequence->svpwm[0].duty 	= 1.0f - result;
+	sequence->svpwm[1].vector 	= vector1;
+	sequence->svpwm[1].duty 	= result * (foc_cos(electic_angle) - foc_sin(electic_angle) * _1_SQRT3);
+	sequence->svpwm[2].vector 	= vector2;
+	sequence->svpwm[2].duty 	= result * foc_sin(electic_angle) * _2_SQRT3;
+}
+
 inline void clarke_to_park(const clarke_t *clarke, park_t *pack, float sine, float cosine)
 {
 /* Arduino-FOC\src\common\base_classes\CurrentSense.cpp Line 72. */

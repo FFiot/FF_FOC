@@ -3,6 +3,11 @@
 #include "foc_util.h"
 #include "simple_foc.h"
 
+static int foc_svpwm(foc_t *self, const phase_data_t *pwm)
+{
+	return pdTRUE;
+}
+
 static int foc_operate(foc_t *self, float mechanic_angle, const phase_data_t *current, float time_diff, phase_data_t *output)
 {	
 	float mechanic_angle_diff = mechanic_angle - self->mechanic_angle_prev;
