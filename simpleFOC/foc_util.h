@@ -61,7 +61,7 @@ void phase_to_clarke(const phase_data_t *input, clarke_t *clarke);
 void clarke_to_phase(const clarke_t *clarke, phase_data_t *output);
 void clarke_to_park(const clarke_t *clack, park_t *park, float sine, float cosine);
 void park_to_clarke(const park_t *pack, clarke_t *clack, float sine, float cosine);
-void park_to_svpwm(const park_t *park, float electic_angle, svpwm_sequence_t *sequence);
+void svpwm_output(float x, float electic_angle, svpwm_sequence_t *sequence);
 
 typedef struct{
 	float P;

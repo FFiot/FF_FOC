@@ -51,58 +51,89 @@ inline void clarke_to_phase(const clarke_t *clarke, phase_data_t *output)
 	output->w = -0.5f * clarke->alpha - _SQRT3_2 * clarke->beta;
 }
 
-inline void park_to_svpwm(const park_t *park, float electic_angle, svpwm_sequence_t *sequence)
+void svpwm_output(float x, float electic_angle, svpwm_sequence_t *sequence)
 {
-	float result = park->q;
-	if(result > 1.0f){
-		result = 1.0f;
+	if(x <= 0.0f){
+		sequence->svpwm[0].vector 		= SVPWM_V0;
+		sequence->svpwm[0].duty			= 1.0f;
+		sequence->svpwm[1].vector 		= SVPWM_V0;
+		sequence->svpwm[1].duty			= 0.0f;
+		sequence->svpwm[2].vector 		= SVPWM_V0;
+		sequence->svpwm[2].duty			= 0.0f;
+		return;
+	}
+	if(x > 1.0f){
+		x = 1.0f;
 	}
 	
-	electic_angle = electic_angle / _PI * 180.0f;
-	electic_angle = electic_angle + 90.0f;
-	
-	while(electic_angle >= 360.0f){
-		electic_angle -= 360.0f;
+	float angle = electic_angle / _PI * 180.0f;
+	while(angle >= 360.0f){
+		angle -= 360.0f;
 	}
-	while(electic_angle < 0.0f){
-		electic_angle += 360.0f;
+	while(angle < 0.0f){
+		angle += 360.0f;
 	}
 	
-	SVPWM_VECTOR_T vector1, vector2;
-	if(electic_angle < 60.0f){			// sector1
-		vector1 = SVPWM_V1;
-		vector2 = SVPWM_V3;
-		electic_angle = electic_angle - 0.0f;
-	}else if(electic_angle < 120.0f){	// sector2
-		vector1 = SVPWM_V3;
-		vector2 = SVPWM_V2;
-		electic_angle = electic_angle - 60.0f;
-	}else if(electic_angle < 180.0f){	// sector3
-		vector1 = SVPWM_V2;
-		vector2 = SVPWM_V6;
-		electic_angle = electic_angle - 120.0f;
-	}else if(electic_angle < 240.0f){	// sector4
-		vector1 = SVPWM_V6;
-		vector2 = SVPWM_V4;
-		electic_angle = electic_angle - 180.0f;
-	}else if(electic_angle < 300.0f){	// sector5
-		vector1 = SVPWM_V4;
-		vector2 = SVPWM_V5;
-		electic_angle = electic_angle - 240.0f;
-	}else if(electic_angle < 360.0f){	// sector6
-		vector1 = SVPWM_V5;
-		vector2 = SVPWM_V1;
-		electic_angle = electic_angle - 300.0f;
+	sequence->svpwm[0].vector 		= SVPWM_V0;
+	if(angle < 60.0f){ // sector1
+		angle = (angle - 0.0f) / 180.0f * _PI;
+		sequence->svpwm[1].vector 	= SVPWM_V1;
+		sequence->svpwm[1].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence->svpwm[2].vector 	= SVPWM_V3;
+		sequence->svpwm[2].duty 	= foc_sin(angle) * _2_SQRT3;
+	}else if(angle < 120.0f){ // sector2
+		angle = (angle - 60.0f) / 180.0f * _PI;
+		sequence->svpwm[2].vector 	= SVPWM_V3;
+		sequence->svpwm[2].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence->svpwm[1].vector 	= SVPWM_V2;
+		sequence->svpwm[1].duty 	= foc_sin(angle) * _2_SQRT3;
+	}else if(angle < 180.0f){ // sector3
+		angle = (angle - 120.0f) / 180.0f * _PI;
+		sequence->svpwm[1].vector 	= SVPWM_V2;
+		sequence->svpwm[1].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence->svpwm[2].vector 	= SVPWM_V6;
+		sequence->svpwm[2].duty 	= foc_sin(angle) * _2_SQRT3;
+	}else if(angle < 240.0f){	// sector4
+		angle = (angle - 180.0f) / 180.0f * _PI;
+		sequence->svpwm[2].vector 	= SVPWM_V6;
+		sequence->svpwm[2].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence->svpwm[1].vector 	= SVPWM_V4;
+		sequence->svpwm[1].duty 	= foc_sin(angle) * _2_SQRT3;
+	}else if(angle < 300.0f){	// sector5
+		angle = (angle - 240.0f) / 180.0f * _PI;
+		sequence->svpwm[1].vector 	= SVPWM_V4;
+		sequence->svpwm[1].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence->svpwm[2].vector 	= SVPWM_V5;
+		sequence->svpwm[2].duty 	= foc_sin(angle) * _2_SQRT3;
+	}else if(angle < 360.0f){	// sector6
+		angle = (angle - 300.0f) / 180.0f * _PI;
+		sequence->svpwm[2].vector 	= SVPWM_V5;
+		sequence->svpwm[2].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence->svpwm[1].vector 	= SVPWM_V1;
+		sequence->svpwm[1].duty 	= foc_sin(angle) * _2_SQRT3;
 	}
 	
-	electic_angle = electic_angle / 180.0f * _PI;
+	sequence->svpwm[1].duty 		= x * sequence->svpwm[1].duty;
+	sequence->svpwm[2].duty 		= x * sequence->svpwm[2].duty;
 	
-	sequence->svpwm[0].vector 	= SVPWM_V0;
-	sequence->svpwm[0].duty 	= 1.0f - result;
-	sequence->svpwm[1].vector 	= vector1;
-	sequence->svpwm[1].duty 	= result * (foc_cos(electic_angle) - foc_sin(electic_angle) * _1_SQRT3);
-	sequence->svpwm[2].vector 	= vector2;
-	sequence->svpwm[2].duty 	= result * foc_sin(electic_angle) * _2_SQRT3;
+	float sum = sequence->svpwm[1].duty + sequence->svpwm[2].duty;
+	if(sum > 1.0f){
+		sequence->svpwm[0].duty 	= 0.0f;
+		sequence->svpwm[1].duty 	= sequence->svpwm[1].duty / sum;
+		sequence->svpwm[2].duty 	= sequence->svpwm[2].duty / sum;
+	}else{
+		sequence->svpwm[0].duty 	= 1.0f - sum;
+	}
+	
+	if(sequence->svpwm[1].duty == 0){
+		sequence->svpwm[1].vector 	= sequence->svpwm[2].vector;
+		sequence->svpwm[1].duty 	= sequence->svpwm[2].duty/2;
+		sequence->svpwm[2].duty 	= sequence->svpwm[2].duty/2;
+	}else if(sequence->svpwm[2].duty == 0){
+		sequence->svpwm[2].vector 	= sequence->svpwm[1].vector;
+		sequence->svpwm[2].duty 	= sequence->svpwm[1].duty/2;
+		sequence->svpwm[1].duty 	= sequence->svpwm[1].duty/2;
+	}
 }
 
 inline void clarke_to_park(const clarke_t *clarke, park_t *pack, float sine, float cosine)
