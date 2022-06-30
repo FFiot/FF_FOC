@@ -3,11 +3,6 @@
 #include "foc_util.h"
 #include "simple_foc.h"
 
-static int foc_svpwm(foc_t *self, const phase_data_t *pwm)
-{
-	return pdTRUE;
-}
-
 static int foc_operate(foc_t *self, float mechanic_angle, const phase_data_t *current, float time_diff, phase_data_t *output)
 {	
 	float mechanic_angle_diff = mechanic_angle - self->mechanic_angle_prev;
@@ -39,8 +34,9 @@ static int foc_operate(foc_t *self, float mechanic_angle, const phase_data_t *cu
 			self->park_input.q = self->q_filter.operate(&self->q_filter, self->park_input.q, time_diff);
 			self->park_output.d = self->d_pid.operate(&self->d_pid, -self->park_input.d, time_diff);
 			self->park_output.q = self->q_pid.operate(&self->q_pid, target-self->park_input.q, time_diff);
-			park_to_clarke(&self->park_output, &self->clarke_output, self->sine, self->cosine);
-			clarke_to_phase(&self->clarke_output, output);
+			svpwm_output(self->park_output.q, self->electic_angle+_PI_2, output);
+//			park_to_clarke(&self->park_output, &self->clarke_output, self->sine, self->cosine);
+//			clarke_to_phase(&self->clarke_output, output);
 		}break;
 		default:{
 			output->u = 0.0f;
