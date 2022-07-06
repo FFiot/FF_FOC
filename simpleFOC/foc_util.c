@@ -89,39 +89,39 @@ void svpwm_output(float x, float electic_angle, phase_data_t *output)
 	if(angle < 60.0f){ // sector1
 		angle = (angle - 0.0f) / 180.0f * _PI;
 		sequence.svpwm[1].vector 	= SVPWM_V1;
-		sequence.svpwm[1].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence.svpwm[1].duty 		= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
 		sequence.svpwm[2].vector 	= SVPWM_V3;
-		sequence.svpwm[2].duty 	= foc_sin(angle) * _2_SQRT3;
+		sequence.svpwm[2].duty 		= foc_sin(angle) * _2_SQRT3;
 	}else if(angle < 120.0f){ // sector2
 		angle = (angle - 60.0f) / 180.0f * _PI;
 		sequence.svpwm[2].vector 	= SVPWM_V3;
-		sequence.svpwm[2].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence.svpwm[2].duty 		= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
 		sequence.svpwm[1].vector 	= SVPWM_V2;
-		sequence.svpwm[1].duty 	= foc_sin(angle) * _2_SQRT3;
+		sequence.svpwm[1].duty 		= foc_sin(angle) * _2_SQRT3;
 	}else if(angle < 180.0f){ // sector3
 		angle = (angle - 120.0f) / 180.0f * _PI;
 		sequence.svpwm[1].vector 	= SVPWM_V2;
-		sequence.svpwm[1].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence.svpwm[1].duty 		= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
 		sequence.svpwm[2].vector 	= SVPWM_V6;
-		sequence.svpwm[2].duty 	= foc_sin(angle) * _2_SQRT3;
+		sequence.svpwm[2].duty 		= foc_sin(angle) * _2_SQRT3;
 	}else if(angle < 240.0f){	// sector4
 		angle = (angle - 180.0f) / 180.0f * _PI;
 		sequence.svpwm[2].vector 	= SVPWM_V6;
-		sequence.svpwm[2].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence.svpwm[2].duty 		= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
 		sequence.svpwm[1].vector 	= SVPWM_V4;
-		sequence.svpwm[1].duty 	= foc_sin(angle) * _2_SQRT3;
+		sequence.svpwm[1].duty 		= foc_sin(angle) * _2_SQRT3;
 	}else if(angle < 300.0f){	// sector5
 		angle = (angle - 240.0f) / 180.0f * _PI;
 		sequence.svpwm[1].vector 	= SVPWM_V4;
-		sequence.svpwm[1].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence.svpwm[1].duty 		= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
 		sequence.svpwm[2].vector 	= SVPWM_V5;
-		sequence.svpwm[2].duty 	= foc_sin(angle) * _2_SQRT3;
+		sequence.svpwm[2].duty 		= foc_sin(angle) * _2_SQRT3;
 	}else if(angle < 360.0f){	// sector6
 		angle = (angle - 300.0f) / 180.0f * _PI;
 		sequence.svpwm[2].vector 	= SVPWM_V5;
-		sequence.svpwm[2].duty 	= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
+		sequence.svpwm[2].duty 		= foc_cos(angle) - foc_sin(angle) * _1_SQRT3;
 		sequence.svpwm[1].vector 	= SVPWM_V1;
-		sequence.svpwm[1].duty 	= foc_sin(angle) * _2_SQRT3;
+		sequence.svpwm[1].duty 		= foc_sin(angle) * _2_SQRT3;
 	}
 	sequence.svpwm[1].duty 		= x * sequence.svpwm[1].duty;
 	sequence.svpwm[2].duty 		= x * sequence.svpwm[2].duty;
